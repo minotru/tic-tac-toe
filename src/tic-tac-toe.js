@@ -10,12 +10,16 @@ class TicTacToe {
     }
 
     checkWinOf(symbol) {
-        let g = this.grid, s = symbol;
-        return ((g[0][0] == s && g[0][1] == s && g[0][2] == s) ||
-                (g[1][0] == s && g[1][1] == s && g[1][2] == s) ||
-                (g[2][0] == s && g[2][1] == s && g[2][2] == s) ||
-                (g[0][0] == s && g[1][1] == s && g[2][2] == s) ||
-                (g[0][2] == s && g[1][1] == s && g[2][0] == s));
+        const check = (el) => (el == symbol);
+        let diagCnt = 0, oddDiagCnt = 0;
+        for (let i = 0; i < 3; i++) {
+            const column =  [this.grid[0][i], this.grid[1][i], this.grid[2][i]];
+            if (this.grid[i].every(check) || column.every(check))
+                return true;
+            diagCnt += this.grid[i][i] == symbol;
+            oddDiagCnt += this.grid[i][2 - i] == symbol;
+        }
+        return diagCnt == 3 || oddDiagCnt == 3;
     }
 
     getCurrentPlayerSymbol() {
@@ -23,6 +27,8 @@ class TicTacToe {
     }
 
     nextTurn(rowIndex, columnIndex) {
+        if (this.grid[rowIndex][columnIndex] !== null) 
+            return;
         this.grid[rowIndex][columnIndex] = this.currentPlayer;
         this.currentPlayer = (this.currentPlayer == 'x') ? 'o': 'x';
     }
@@ -43,13 +49,13 @@ class TicTacToe {
     noMoreTurns() {
         for (let i = 0; i < 3; i++)
             for (let j = 0; j < 3; j++)
-                if (this.grid[i][j])
+                if (this.grid[i][j] === null)
                     return false;
         return true;
     }
 
     isDraw() {
-        return this.noMoreTurns() && !this.getWinner();
+        return this.noMoreTurns() && this.getWinner() === null;
     }
 
     getFieldValue(rowIndex, colIndex) {
